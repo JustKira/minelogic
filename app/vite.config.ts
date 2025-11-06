@@ -1,7 +1,8 @@
 import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
+import viteReact from '@vitejs/plugin-react'
 import { tanstackRouter } from '@tanstack/router-plugin/vite'
 import path from 'path'
+import Icons from 'unplugin-icons/vite'
 import tailwindcss from '@tailwindcss/vite'
 
 const host = process.env.TAURI_DEV_HOST
@@ -13,7 +14,16 @@ export default defineConfig(async () => ({
       target: 'react',
       autoCodeSplitting: true,
     }),
-    react(),
+    viteReact({
+      babel: {
+        plugins: ['babel-plugin-react-compiler'],
+      },
+    }),
+    Icons({
+      autoInstall: true,
+      compiler: 'jsx',
+      jsx: 'react',
+    }),
     tailwindcss(),
   ],
 
