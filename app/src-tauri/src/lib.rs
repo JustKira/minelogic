@@ -1,12 +1,15 @@
 use specta_typescript::Typescript;
 
-// use tauri::Manager;
+use tauri::Manager;
 use tauri_specta::{collect_commands, Builder};
-// use tokio::sync::Mutex;
+use tokio::sync::Mutex;
 
 mod errors;
 mod projects;
+mod ssh;
+
 use projects::commands::*;
+use ssh::commands::*;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -17,7 +20,10 @@ pub fn run() {
             add_remote_project,
             list_all_projects,
             remove_remote_project,
-            remove_local_project
+            remove_local_project,
+            connect_to_remote_project,
+            get_active_connection,
+            list_directory,
         ]);
 
     #[cfg(debug_assertions)]
@@ -39,6 +45,8 @@ pub fn run() {
         // and finally tell Tauri how to invoke them
         .invoke_handler(builder.invoke_handler())
         .setup(move |app| {
+            app.manage(Mutex::new(ssh::state::SFTPConnectionState::default()));
+
             builder.mount_events(app);
 
             Ok(())

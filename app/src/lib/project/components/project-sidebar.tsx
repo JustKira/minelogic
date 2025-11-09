@@ -9,7 +9,7 @@ import {
 
 export function ProjectSidebar() {
   return (
-    <Sidebar>
+    <Sidebar variant="floating">
       <SidebarHeader />
       <SidebarContent>
         <SidebarGroup />

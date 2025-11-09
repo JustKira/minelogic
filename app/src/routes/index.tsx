@@ -35,10 +35,15 @@ import {
   ItemActions,
   ItemContent,
   ItemDescription,
-  ItemMedia,
   ItemTitle,
 } from '@/lib/core/elements/item'
 import { RemoteProject } from '@/core/api/tauri_bindings'
+import {
+  useConnectToRemoteProjectMutation,
+  useGetActiveConnectionQuery,
+} from '@/lib/ssh/api'
+import { toast } from 'sonner'
+import { ModeToggle } from '@/lib/core/components/mode-toggle'
 
 export const Route = createFileRoute('/')({
   component: RouteComponent,
@@ -98,6 +103,10 @@ function RouteComponent() {
           </div>
         </div>
       )}
+
+      <div className="absolute bottom-4 left-4">
+        <ModeToggle />
+      </div>
     </main>
   )
 }
@@ -109,11 +118,45 @@ const RemoteProjectItem = ({
   id: string
   project: RemoteProject
 }) => {
+  const navigate = Route.useNavigate()
   const removeProjectMutation = useRemoveRemoteProjectMutation()
+  const connectToRemoteProjectMutation = useConnectToRemoteProjectMutation()
+
+  const activeConnectionQuery = useGetActiveConnectionQuery()
 
   const handleRemoveProject = () => {
     removeProjectMutation.mutate(id)
   }
+
+  const handleConnectToRemoteProject = () => {
+    if (activeConnectionQuery.data && activeConnectionQuery.data.id === id) {
+      return navigate({
+        to: '/projects/project_id',
+        params: { project_id: id },
+      })
+    }
+
+    toast.promise(connectToRemoteProjectMutation.mutateAsync(id), {
+      loading: 'Connecting to remote project...',
+      success: () => {
+        navigate({
+          to: '/projects/project_id',
+          params: { project_id: id },
+        })
+        return 'Connected to remote project'
+      },
+      error: (error) => {
+        if (error instanceof Error) {
+          return error.message
+        }
+        if (typeof error === 'string') {
+          return error
+        }
+        return 'Failed to connect to remote project'
+      },
+    })
+  }
+
   return (
     <Item variant="outline">
       <ItemContent>
@@ -123,12 +166,19 @@ const RemoteProjectItem = ({
         </ItemDescription>
       </ItemContent>
       <ItemActions>
-        <Button variant="outline" size="lg">
-          Connect
+        <Button
+          variant="outline"
+          size="lg"
+          disabled={connectToRemoteProjectMutation.isPending}
+          onClick={handleConnectToRemoteProject}
+        >
+          {activeConnectionQuery.data && activeConnectionQuery.data.id === id
+            ? 'Open Project'
+            : 'Connect'}
         </Button>
         <Dialog>
           <DialogTrigger asChild>
-            <Button variant="ghost" size="icon-lg">
+            <Button variant="destructive" size="icon-lg">
               <TrashIcon />
             </Button>
           </DialogTrigger>

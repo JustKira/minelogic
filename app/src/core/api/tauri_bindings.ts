@@ -44,6 +44,30 @@ async removeLocalProject(id: string) : Promise<Result<null, string>> {
     if(e instanceof Error) throw e;
     else return { status: "error", error: e  as any };
 }
+},
+async connectToRemoteProject(id: string) : Promise<Result<null, string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("connect_to_remote_project", { id }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async getActiveConnection() : Promise<Result<ActiveConnection, string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("get_active_connection") };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async listDirectory(dir: string) : Promise<Result<FileSystemEntry[], string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("list_directory", { dir }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
 }
 }
 
@@ -57,6 +81,10 @@ async removeLocalProject(id: string) : Promise<Result<null, string>> {
 
 /** user-defined types **/
 
+export type ActiveConnection = { id: string; project: RemoteProject }
+export type DirEntry = { name: string; type: string }
+export type FileEntry = { name: string; type: string; size: number }
+export type FileSystemEntry = ({ entry_type: "File" } & FileEntry) | ({ entry_type: "Directory" } & DirEntry)
 export type LocalProject = { path: string }
 export type ProjectsList = { local_projects: Partial<{ [key in string]: LocalProject }>; remote_projects: Partial<{ [key in string]: RemoteProject }> }
 export type RemoteProject = { host: string; port: number; user: string; password: string }

@@ -1,6 +1,7 @@
 import { tauriQuery } from '@/core/api/helpers'
 import { commands } from '@/core/api/tauri_bindings'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
 
 enum ProjectQueryKeys {
   PROJECTS = 'projects',
@@ -24,6 +25,10 @@ export const useAddLocalProjectMutation = () => {
     onSuccess() {
       queryClient.invalidateQueries({ queryKey: [ProjectQueryKeys.PROJECTS] })
     },
+    onError(error) {
+      console.error(error)
+      toast.error(error.toString())
+    },
   })
 }
 
@@ -37,11 +42,12 @@ export const useAddRemoteProjectMutation = () => {
     mutationFn: (inputs: AddRemoteProjectInputs) => {
       return tauriQuery(() => commands.addRemoteProject(...inputs))
     },
-    onError(error) {
-      console.error(error)
-    },
     onSuccess() {
       queryClient.invalidateQueries({ queryKey: [ProjectQueryKeys.PROJECTS] })
+    },
+    onError(error) {
+      console.error(error)
+      toast.error(error.toString())
     },
   })
 }
@@ -54,6 +60,10 @@ export const useRemoveRemoteProjectMutation = () => {
     },
     onSuccess() {
       queryClient.invalidateQueries({ queryKey: [ProjectQueryKeys.PROJECTS] })
+    },
+    onError(error) {
+      console.error(error)
+      toast.error(error.toString())
     },
   })
 }
