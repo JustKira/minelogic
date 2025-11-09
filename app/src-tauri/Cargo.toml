@@ -22,4 +22,18 @@ tauri = { version = "2", features = [] }
 tauri-plugin-opener = "2"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
-
+dirs = "6.0.0"
+tauri-plugin-store = "2"
+jsonschema = "0.33.0"
+russh = "0.54.6"
+specta = "=2.0.0-rc.22"
+tauri-specta = { version = "=2.0.0-rc.21", features = ["derive", "typescript"] }
+russh-sftp = "2.1.1"
+log = "0.4.28"
+ssh-key = "0.6.7"
+tokio = "1.48.0"
+tauri-plugin-log = "2"
+specta-typescript = "0.0.9"
+thiserror = "2.0.17"
+anyhow = "1.0.100"
+nanoid = "0.4.0"

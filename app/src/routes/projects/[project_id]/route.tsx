@@ -9,9 +9,9 @@ export const Route = createFileRoute('/projects/project_id')({
 
 function RouteComponent() {
   return (
-    <SidebarProvider>
+    <SidebarProvider >
       <ProjectSidebar />
-      <main>
+      <main className="">
         <SidebarTrigger />
         <Outlet />
       </main>
